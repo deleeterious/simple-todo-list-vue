@@ -1,7 +1,8 @@
 <script setup>
-import TodoList from "./components/TodoList.vue";
+import { RouterView } from 'vue-router'
+
 </script>
 
 <template>
-  <TodoList />
+  <RouterView />
 </template>
