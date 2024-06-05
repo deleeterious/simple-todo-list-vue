@@ -1,34 +1,43 @@
-<script setup>
+<script setup lang="ts">
+import axios from 'axios';
 import TodoItem from "./TodoItem.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { Todo } from '../types';
 
-const todoList = ref([
-  { id: Math.random(), title: "Todo 1", completed: false },
-  { id: Math.random(), title: "Todo 2", completed: false },
-  { id: Math.random(), title: "Todo 3", completed: true },
-]);
+const todoList = ref<Todo[]>([]);
 
-const todoTitle = ref('')
+const todoTitle = ref('');
 
-const handleCreateTodoItem = () => {
-  todoList.value = [
-    ...todoList.value,
-    { id: Math.random(), title: todoTitle.value, completed: false },
-  ];
+const fetchTodoList = async () => {
+  return await axios.get('http://localhost:8080/todos')
+}
+
+const updateTodoItem = async (id: number, data: Partial<Todo>) => {
+  return await axios.patch(`http://localhost:8080/todos/${id}`, data)
+}
+
+const createTodoList = async (data: Omit<Todo, 'id' | 'completed'>) => {
+  return await axios.post(`http://localhost:8080/todos`, data)
+}
+
+const deleteTodoItem = async (id: number) => {
+  return await axios.delete(`http://localhost:8080/todos/${id}`,)
+}
+
+const handleCreateTodoItem = async () => {
+  todoList.value = (await createTodoList({ title: todoTitle.value })).data
 };
 
-const handleTitleClick = (id) => {
-  todoList.value = todoList.value.map((item) => {
-    if (item.id === id) {
-      return { ...item, completed: !item.completed };
-    }
-    return item;
-  });
+const handleTitleClick = async (id: number) => {
+  todoList.value = (await updateTodoItem(id, { completed: true })).data
 };
 
-const handleDeleteClick = (id) => {
-  todoList.value = todoList.value.filter((item) => item.id !== id);
+const handleDeleteClick = async (id: number) => {
+  todoList.value = (await deleteTodoItem(id)).data
 };
+
+onMounted(async () => todoList.value = (await fetchTodoList()).data)
+
 </script>
 
 <template>

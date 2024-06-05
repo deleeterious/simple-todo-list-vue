@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ToDo } from "../types.ts";
+import { Todo } from "../types.ts";
 
 defineProps<{ data: ToDo }>();
 </script>
